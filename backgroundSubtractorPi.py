@@ -7,6 +7,7 @@ import datetime
 import imutils
 import time
 import cv2
+import json
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--conf", required=True,
@@ -21,6 +22,7 @@ client = None
 camera = PiCamera()
 camera.resolution = tuple(conf["resolution"])
 camera.framerate = conf["fps"]
+camera.vflip = True
 rawCapture = PiRGBArray(camera, size=tuple(conf["resolution"]))
  
 # allow the camera to warmup, then initialize the average frame, last
@@ -57,11 +59,9 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 
 	# threshold the delta image, dilate the thresholded image to fill
 	# in holes, then find contours on thresholded image
-	thresh = cv2.threshold(frameDelta, conf["delta_thresh"], 255,
-		cv2.THRESH_BINARY)[1]
+	thresh = cv2.threshold(frameDelta, conf["delta_thresh"], 255,cv2.THRESH_BINARY)[1]
 	thresh = cv2.dilate(thresh, None, iterations=2)
-	(cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-		cv2.CHAIN_APPROX_SIMPLE)
+	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
  
 	# loop over the contours
 	for c in cnts:
@@ -81,16 +81,12 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 		cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 	cv2.putText(frame, ts, (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
 		0.35, (0, 0, 255), 1)
-	# check to see if the room is occupied
-	if text == "Occupied":
- 
-	# otherwise, the room is not occupied
-	else:
-		motionCounter = 0
 	# check to see if the frames should be displayed to screen
 	if conf["show_video"]:
 		# display the security feed
 		cv2.imshow("Security Feed", frame)
+		cv2.imshow("Thresh", thresh)
+		cv2.imshow("delta", frameDelta)
 		key = cv2.waitKey(1) & 0xFF
  
 		# if the `q` key is pressed, break from the lop
