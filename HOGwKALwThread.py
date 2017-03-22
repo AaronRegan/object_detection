@@ -67,7 +67,7 @@ while fps._numFrames < conf["number_frames"]:
         # grab the raw NumPy array representing the image and initialize
         # the timestamp and occupied/unoccupied text
         frame = vs.read()
-        frame = imutils.resize(frame, width=250)
+        frame = imutils.resize(frame, width=300)
         frame = cv2.flip(frame,0)
         # detect people in the image
         e1 = cv2.getTickCount()

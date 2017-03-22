@@ -43,7 +43,7 @@ while fps._numFrames < conf["number_frames"]:
         # grab the raw NumPy array representing the image and initialize
         # the timestamp and occupied/unoccupied text
         frame = vs.read()
-        frame = imutils.resize(frame, width=400)
+        frame = imutils.resize(frame, width=250)
         frame = cv2.flip(frame,0)
         f2 = cv2.getTickCount()
 
@@ -51,7 +51,7 @@ while fps._numFrames < conf["number_frames"]:
                 
         e1 = cv2.getTickCount()
         # detect people in the image
-        (rects, weights) = hog.detectMultiScale(frame, winStride=(16, 16),
+        (rects, weights) = hog.detectMultiScale(frame, winStride=(8, 8),
                                             padding=(16, 16), scale=1.05)
         e2 = cv2.getTickCount()
         timeHOG = (e2-e1)/cv2.getTickFrequency()
@@ -62,7 +62,9 @@ while fps._numFrames < conf["number_frames"]:
         # draw the final bounding boxes
         for (xA, yA, xB, yB) in pick:
             cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
-        
+        frame = imutils.resize(frame, width=600)    
+        print_HOG_time = "[INFO] HOG RUN TIME: "+ str(timeHOG)
+        cv2.putText(frame, print_HOG_time, (10,55), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
         cv2.imshow("Frame", frame)
         k = cv2.waitKey(1) & 0xff
         if k == ord("q"):
