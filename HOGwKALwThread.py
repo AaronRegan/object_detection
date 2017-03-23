@@ -29,6 +29,9 @@ tp = np.zeros((2, 1), np.float32)  # tracked / prediction
 #intialzing variables for storing clock times
 totalHOG = 0
 totalKAL = 0
+#initiliase performance variables for counting frames
+Detection=0
+Frames=0
 #assign the descriptor to its variable & call the people Detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -64,6 +67,7 @@ avg = None
 
 #perform this loop until the user exits
 while(True):
+    	frames = frames+1
         #grab the frame from the top of the queue
         frame = vs.read()
         #resize to 300
@@ -108,15 +112,19 @@ while(True):
         if k == ord("q"):
             break
         fps.update()
-        print ("{}".format(timeHOG)
+        #print ("{}".format(timeHOG))
         totalKAL= timeKAL+totalKAL
         totalHOG= timeHOG+totalHOG
 #print all stored Data for analysis
 totalAvgHOG = totalHOG/fps._numFrames
 totalAvgKAL = totalKAL/fps._numFrames
 fps.stop()
+Performance = (float(detection)/(frames))*100
+if Performance >= 100:
+	Performance = 100
 print("INFO elapsed time: {:.2f}".format(fps.elapsed()))
 print("INFO approx FPS {:.2f}".format(fps.fps()))
+print("INFO Performance: {:.2f}".format(Performance))
 print("INFO Average time to complete HOG: {:.2f} Seconds".format(totalAvgHOG))
 print("INFO Average time to complete NMS: {:.2f} Seconds".format(totalAvgKAL))
 cv2.destroyAllWindows()

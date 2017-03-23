@@ -28,7 +28,9 @@ totalResize = 0
 #assign the descriptor to its variable & call the people Detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-
+#initiliase performance variables for counting frames
+Detection=0
+Frames=0
 
 #start camera stream , first allow camera to warm up , JSON set to 2.5 seconds
 print("[INFO] warming up...")
@@ -40,6 +42,7 @@ fps = FPS().start()
 
 #run this loop until user exits
 while(True):
+	frames = frames+1
         #start clock for timin resize
         f1 = cv2.getTickCount()
         #read incoming frame from queue and resize and flip
@@ -68,6 +71,7 @@ while(True):
         for (xA, yA, xB, yB) in pick:
             cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
             #resize frame to make it easier to view
+	    detection= detection+1
         frame = imutils.resize(frame, width=600)    
         print_HOG_time = "[INFO] HOG RUN TIME: "+ str(timeHOG)
         cv2.putText(frame, print_HOG_time, (10,55), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
@@ -80,15 +84,19 @@ while(True):
         if k == ord("q"):
                 break
         fps.update()
-        print(timeHOG)
+        #print(timeHOG)
         totalHOG= timeHOG+totalHOG
         totalResize= timeResize+totalResize
 #print all stored Data for analysis
 totalAvgHOG = totalHOG/fps._numFrames
 totalAvgResize = totalResize/fps._numFrames
 fps.stop()
+Performance = (float(detection)/(frames))*100
+if Performance >= 100:
+	Performance = 100
 print("INFO elapsed time: {:.2f}".format(fps.elapsed()))
 print("INFO approx FPS {:.2f}".format(fps.fps()))
+print("INFO Performance: {:.2f}".format(Performance))
 print("INFO Average time to complete HOG: {:.2f} Seconds".format(totalAvgHOG))
 print("INFO Average time to complete NMS: {:.2f} Seconds".format(totalAvgResize))
 cv2.destroyAllWindows()
