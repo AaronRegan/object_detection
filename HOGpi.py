@@ -42,7 +42,6 @@ fps = FPS().start()
 # capture frames from the camera
 for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         frame = f.array
-        timestamp = datetime.datetime.now()
         frame = imutils.resize(frame, width=400)
 
             # detect people in the image
